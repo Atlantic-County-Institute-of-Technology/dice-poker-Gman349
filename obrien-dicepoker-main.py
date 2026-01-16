@@ -1,0 +1,109 @@
+# imports
+import inquirer3
+from dice import *
+
+# variables
+dice = Dice()
+def_dice_rolls = 3
+
+# dice photos
+topstr = "┏━━━━━━━━━━━┓"
+btmstr = "┗━━━━━━━━━━━┛"
+oned = ["┃           ┃",
+        "┃     ●     ┃",
+        "┃           ┃"]
+
+twod = ["┃ ●         ┃",
+        "┃           ┃",
+        "┃         ● ┃"]
+
+threed = ["┃ ●         ┃",
+          "┃     ●     ┃",
+          "┃         ● ┃"]
+
+fourd = ["┃ ●       ● ┃",
+         "┃           ┃",
+         "┃ ●       ● ┃"]
+
+fived = ["┃ ●       ● ┃",
+         "┃     ●     ┃",
+         "┃ ●       ● ┃"]
+
+sixd = ["┃ ●       ● ┃",
+        "┃ ●       ● ┃",
+        "┃ ●       ● ┃"]
+
+facelist = [oned, twod, threed, fourd, fived, sixd]  # list the dice together
+
+
+def show(keep, dlist):
+    top = ""
+    topcenter = ""
+    center = ""
+    bottomcenter = ""
+    bottom = ""
+    dicelist = dice.roll_dice(keep)
+    dlist = dicelist
+    for i in dicelist:
+        face = facelist[i - 1]
+        top = top + " " + topstr
+        topcenter = topcenter + " " + str(face[0])
+        center = center + " " + str(face[1])
+        bottomcenter = bottomcenter + " " + str(face[2])
+        bottom = bottom + " " + btmstr
+    print(f"{top}\n{topcenter}\n{center}\n{bottomcenter}\n{bottom}")
+
+
+def keep(keep, keeplist, dicelist):
+    for i in keeplist:
+        keep.append(i)
+
+
+def player_turn(dice_rolls, keep):
+    dlist = []
+    show(keep, dlist)
+    dice_rolls = dice_rolls - 1
+    play = [
+        inquirer3.List("play", message="What would you like to do?", choices=["Keep Dice", "End Turn"])
+    ]
+    answer = inquirer3.prompt(play)
+
+    if answer("play") == "Keep Dice":
+        keeplist = []
+        keep(keep, keeplist, dlist)
+
+
+def computer_turn(dice_rolls, keep):
+    show(keep)
+
+
+def player_vs_computer():
+    keep = []
+    ckeep = []
+    dice_rolls = int(def_dice_rolls)
+    cdice_rolls = int(def_dice_rolls)
+    finished = False
+    while not finished:
+        player_turn(dice_rolls, keep)
+        computer_turn(cdice_rolls, ckeep)
+        if dice_rolls & cdice_rolls == 0:
+            finished = True
+
+
+def player_vs_player():
+    dice_rolls = int(def_dice_rolls)
+
+
+def main():
+    menu = [
+        inquirer3.List("menu", message="What mode would you like to play?", choices=["1 vs. Computer", "1 vs. 1"])
+    ]
+    menu_answers = inquirer3.prompt(menu)
+    if menu_answers("menu") == "1 vs. Computer":
+        player_vs_computer()
+    else:
+        player_vs_player()
+
+
+if __name__ == '__main__':
+    main()
