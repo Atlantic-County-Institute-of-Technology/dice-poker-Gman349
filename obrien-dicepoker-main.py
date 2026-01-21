@@ -101,19 +101,19 @@ def player_vs_computer():
             finished = True
 
 
-def player_vs_player(self):
-    self.p1keep = []
-    self.p2keep = []
+def player_vs_player():
+    p1keep = []
+    p2keep = []
     p1dice_rolls = int(def_dice_rolls)
     p2dice_rolls = int(def_dice_rolls)
     finished = False
     while not finished:
         print("PLAYER 1 TURN")
-        player_turn(p1dice_rolls, self.p1keep)
-        print(self.p1keep)
+        player_turn(p1dice_rolls, p1keep)
+        print(p1keep)
         print("PLAYER 2 TURN")
-        player_turn(p2dice_rolls, self.p2keep)
-        print(self.p2keep)
+        player_turn(p2dice_rolls, p2keep)
+        print(p2keep)
         if p1dice_rolls & p2dice_rolls == 0:
             finished = True
 
