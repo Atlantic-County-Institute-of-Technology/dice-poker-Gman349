@@ -8,10 +8,11 @@ class Dice:
         self.dice = []
 
     def roll_dice(self, keep):
-        for i in range(self.MAX_DICE - len(self.keep)):
+        self.dice = []
+        for i in range(self.MAX_DICE - len(keep)):
             num = random.randint(1, 6)
             self.dice.append(num)
-        return self.dice + keep
+        return keep + self.dice
 
 
 class Die:
