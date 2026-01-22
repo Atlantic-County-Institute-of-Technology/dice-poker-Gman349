@@ -54,9 +54,23 @@ def show(keepl):
     return dicelist
 
 
-def keep(keepl, keeplist, dicelist):
-    for i in keeplist:
+def keep(keepl, items_to_add):
+    for i in items_to_add:
         keepl.append(i)
+
+
+def get_score(hand1, hand2, comp_or_prsn):
+
+    hand_ranks = ["Five of Kind", "Four of Kind", "Full House", "Two Pair", "One Pair", "Bust"]
+
+    name = ""
+    if comp_or_prsn == 1:
+        name = 'Player 2:'
+    else:
+        name = 'Computer'
+    print("FINAL HANDS:\n"
+          f"Player 1:{hand1}\n"
+          f"{name}{hand2}\n")
 
 
 def player_turn(dice_rolls, keepl):
@@ -68,24 +82,25 @@ def player_turn(dice_rolls, keepl):
     answer = inquirer3.prompt(play)
 
     if answer["play"] == "Keep Dice":
-        keeplist = []
-        keepcl = []
+        newly_rolled_dice = dlist[len(keepl):]
+        if newly_rolled_dice:
+            keepquestion = [
+                inquirer3.Checkbox("menu", message="Which dice would you like to keep?",
+                                   choices=newly_rolled_dice)
+            ]
+            keepqa = inquirer3.prompt(keepquestion)
+            print(f"Keeping {keepqa['menu']}")
+            keep(keepl, keepqa["menu"])
+        else:
+            print("No unkept dice to keep!")
 
-        for i in dlist:
-            if dlist.index(i) > (len(keeplist) - 1):
-                keepcl.append(i)
-
-        keepquestion = [
-            inquirer3.Checkbox("menu", message="Which dice would you like to keep?",
-                               choices=keepcl)
-        ]
-        keepqa = inquirer3.prompt(keepquestion)
-        print(keepqa["menu"])
-        keep(keepl, keeplist, dlist)
+    return dice_rolls
 
 
 def computer_turn(dice_rolls, keepl):
     show(keepl)
+
+    return dice_rolls - 1
 
 
 def player_vs_computer():
@@ -101,21 +116,25 @@ def player_vs_computer():
             finished = True
 
 
-def player_vs_player(self):
-    self.p1keep = []
-    self.p2keep = []
+def player_vs_player():
+    p1keep = []
+    p2keep = []
     p1dice_rolls = int(def_dice_rolls)
     p2dice_rolls = int(def_dice_rolls)
     finished = False
+
     while not finished:
-        print("PLAYER 1 TURN")
-        player_turn(p1dice_rolls, self.p1keep)
-        print(self.p1keep)
-        print("PLAYER 2 TURN")
-        player_turn(p2dice_rolls, self.p2keep)
-        print(self.p2keep)
-        if p1dice_rolls & p2dice_rolls == 0:
+        if p1dice_rolls > 0:
+            print(f"\n--- PLAYER 1 TURN ({p1dice_rolls} rolls left) ---")
+        p1dice_rolls = player_turn(p1dice_rolls, p1keep)
+        if p2dice_rolls > 0:
+            print(f"\n--- PLAYER 2 TURN ({p2dice_rolls} rolls left) ---")
+        p2dice_rolls = player_turn(p2dice_rolls, p2keep)
+        print("\n-------------------------")
+        if p1dice_rolls == 0 and p2dice_rolls == 0:
             finished = True
+            print("Game Over!")
+            get_score(p1keep, p2keep, 1)
 
 
 def main():
@@ -129,5 +148,5 @@ def main():
         player_vs_player()
 
 
-if __name__ == '__main__':
+while __name__ == '__main__':
     main()
