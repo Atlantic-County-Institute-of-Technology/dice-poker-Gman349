@@ -13,17 +13,3 @@ class Dice:
             num = random.randint(1, 6)
             self.dice.append(num)
         return keep + self.dice
-
-
-class Die:
-    DEF_ROLL = 1
-
-    def __init__(self):
-        self.value = self.DEF_ROLL
-
-    def roll(self):
-        self.value = random.randint(1, 6)
-        return self.value
-
-    def get_value(self):
-        return self.value
