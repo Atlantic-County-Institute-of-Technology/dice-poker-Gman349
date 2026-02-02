@@ -65,8 +65,8 @@ def show(keepl, final):
 
 
 def keep(keepl, items_to_add):  # for each new dice to keep, append dice number to corresponding keep list
-    for i in items_to_add:
-        keepl.append(i)
+    for i in items_to_add:  # for each item in list run loop
+        keepl.append(i)  # append item to main keep list
 
 
 def get_score(hand1, hand2, comp_or_prsn):
@@ -80,7 +80,6 @@ def get_score(hand1, hand2, comp_or_prsn):
         sorted_hand = sorted(hand, reverse=True)  # sort in descending order
         counts = Counter(hand)
         count_values = sorted(counts.values(), reverse=True)  # the amount of each number there are
-        unique_values = sorted(counts.keys(), reverse=True)  # what the numbers of the dice are without repetitions
 
         is_straight = (len(counts) == 5) and (sorted_hand[0] - sorted_hand[4] == 4)  # Check for Straight
         if count_values[0] == 5:  # checks for five of a kind
@@ -150,43 +149,47 @@ def get_score(hand1, hand2, comp_or_prsn):
 def player_turn(dice_rolls, keepl):
     dlist = show(keepl, False)  # displays dice to player and generates number list
     dice_rolls = dice_rolls - 1  # subtract roll counter
-    if dice_rolls == 0:
+    if dice_rolls == 0:  # if it was the last roll, automatically keep everything
         keepqa = dlist[len(keepl):]
         keep(keepl, keepqa)
-    else:
+    else:  # if there are more rolls, ask to keep
         play = [
             inquirer3.List("play", message="What would you like to do?", choices=["Keep Dice", "End Turn"])
         ]
         answer = inquirer3.prompt(play)
 
-        if answer["play"] == "Keep Dice":
-            newly_rolled_dice = dlist[len(keepl):]
+        if answer["play"] == "Keep Dice":  # if user selects keep dice, prompt to keep dice that aren't already kept
+            newly_rolled_dice = dlist[len(keepl):]  # unkept dice list generation
             if newly_rolled_dice:
-                keepquestion = [
+                keepquestion = [  # multiselect menu of unkept dice
                     inquirer3.Checkbox("menu",
                                        message="Which dice would you like to keep? (Space to select, enter to confirm)",
                                        choices=newly_rolled_dice)
                 ]
                 keepqa = inquirer3.prompt(keepquestion)
-                print(f"Keeping {keepqa['menu']}")
-                keep(keepl, keepqa["menu"])
-            else:
+
+                keep_print = "Keeping:"  # creates string for printing kept dice
+                for i in keepqa["menu"]:  # for every dice kept, run loop
+                    keep_print = keep_print + f" {i} "  # add dice to keep string
+                print(keep_print)  # print keep string
+                keep(keepl, keepqa["menu"])  # keep dice
+            else:  # if no more dice, continue to next turn
                 print("No unkept dice to keep!")
 
     return dice_rolls
 
 
 def computer_turn(dice_rolls, keepl):
-    dlist = show(keepl, False)
-    newly_rolled = dlist[len(keepl):]
-    dice_rolls = dice_rolls - 1
+    dlist = show(keepl, False)  # displays dice to player and generates number list
+    newly_rolled = dlist[len(keepl):]  # unkept dice list generation
+    dice_rolls = dice_rolls - 1  # subtract roll counter
 
-    if not newly_rolled:
+    if not newly_rolled:  # if no more dice to keep, hand is full
         print("No dice to roll, hand is full.")
         return dice_rolls
 
-    current_counts = Counter(keepl)
-    new_counts = Counter(newly_rolled)
+    current_counts = Counter(keepl)  # keep counter
+    new_counts = Counter(newly_rolled)  # new dice counter
     to_keep = []
 
     if current_counts:
@@ -217,52 +220,62 @@ def computer_turn(dice_rolls, keepl):
         needed = 5 - new_hand_size
         additional = singles[:needed]
         to_keep += additional
-
-    print(f"Computer keeping: {to_keep}")
-    keep(keepl, to_keep)
+    keep_print = "Computer Keeping:"  # string for printing newly kept dice
+    for i in to_keep:  # for each dice computer chose to keep, run loop
+        keep_print = keep_print + f" {i} "  # add dice to keep string
+    print(keep_print)  # print keep string
+    keep(keepl, to_keep)  # run code to keep dice
     return dice_rolls
 
 
 def player_vs_computer():
+    # keep lists
     p1keep = []
     ckeep = []
+    # roll count
     p1dice_rolls = int(def_dice_rolls)
     cdice_rolls = int(def_dice_rolls)
+    # variable for if playing still or not
     playing = True
 
-    while playing:
-        if p1dice_rolls > 0:
+    while playing:  # while playing run loop
+        if p1dice_rolls > 0:  # if player has rolls, run player turn
             print(f"\n--- PLAYER 1 TURN ({p1dice_rolls - 1} rolls left) ---")
         p1dice_rolls = player_turn(p1dice_rolls, p1keep)
-        if cdice_rolls > 0:
+        if cdice_rolls > 0:  # if computer has rolls, run computer turn
+            os.system('cls' if os.name == "nt" else 'clear')  # clear term to prevent scrolling glitch in PyCharm term
             print(f"\n--- COMPUTER TURN ({cdice_rolls - 1} rolls left) ---")
         cdice_rolls = computer_turn(cdice_rolls, ckeep)
         print("\n-------------------------")
-        if p1dice_rolls == 0 and cdice_rolls == 0:
-            playing = False
-            print("Game Over!")
-            get_score(p1keep, ckeep, 0)
+        if p1dice_rolls == 0 and cdice_rolls == 0:  # if no more rolls, run game over sequence
+            playing = False  # stop loop
+            print("Game Over!")  # notify player
+            get_score(p1keep, ckeep, 0)  # run scoring function
 
 
 def player_vs_player():
+    # keep lists
     p1keep = []
     p2keep = []
+    # roll count
     p1dice_rolls = int(def_dice_rolls)
     p2dice_rolls = int(def_dice_rolls)
+    # variable for if playing still or not
     playing = True
 
-    while playing:
-        if p1dice_rolls > 0:
-            print(f"\n--- PLAYER 1 TURN ({p1dice_rolls} rolls left) ---")
+    while playing:  # while playing run loop
+        if p1dice_rolls > 0:  # if player has rolls, run player turn
+            print(f"\n--- PLAYER 1 TURN ({p1dice_rolls - 1} rolls left) ---")
         p1dice_rolls = player_turn(p1dice_rolls, p1keep)
-        if p2dice_rolls > 0:
-            print(f"\n--- PLAYER 2 TURN ({p2dice_rolls} rolls left) ---")
+        if p2dice_rolls > 0:  # if player has rolls, run player turn
+            os.system('cls' if os.name == "nt" else 'clear')  # clear term to prevent scrolling glitch in PyCharm term
+            print(f"\n--- PLAYER 2 TURN ({p2dice_rolls - 1} rolls left) ---")
         p2dice_rolls = player_turn(p2dice_rolls, p2keep)
         print("\n-------------------------")
-        if p1dice_rolls == 0 and p2dice_rolls == 0:
-            playing = False
-            print("Game Over!")
-            get_score(p1keep, p2keep, 1)
+        if p1dice_rolls == 0 and p2dice_rolls == 0:  # if no more rolls, run game over sequence
+            playing = False  # stop loop
+            print("Game Over!")  # notify players
+            get_score(p1keep, p2keep, 1)  # run scoring function
 
 
 def main():
@@ -280,8 +293,6 @@ def main():
     else:
         player_vs_player()
 
-
-# test
 
 while __name__ == '__main__':
     main()
